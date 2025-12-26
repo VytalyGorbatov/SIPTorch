@@ -9,10 +9,11 @@
 # This module requires SIPTorch
 # https://github.com/0xInfection/SIPTorch
 
-import logging, random
+import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_huge_numeric_string, random_int_str
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -40,14 +41,14 @@ def reqsclarg():
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the max-forwards header
-    head['Max-Forwards'] = '300'
+    head['Max-Forwards'] = random_int_str(200, 800)
     # Tweak 2: Add large scalar value in cseq
     head['CSeq'] = head.get('CSeq').replace(
-        head.get('CSeq').split(' ')[0], str(random.getrandbits(100)))
+        head.get('CSeq').split(' ')[0], random_huge_numeric_string(12, 28))
     # Tweak 3: Add Expires value > 2**32-1
-    head['Expires'] = '1'*100
+    head['Expires'] = random_huge_numeric_string(14, 36)
     # Tweak 4: Contact header expires header
-    head['Contact'] += ';expires=%s' % random.getrandbits(100)
+    head['Contact'] += ';expires=%s' % random_huge_numeric_string(12, 30)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

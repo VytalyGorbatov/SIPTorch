@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_unknown_param
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -36,8 +37,8 @@ def cparam1():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Add an unknwown param to contact header
-    head['Contact'] += ';unknownparam'
+    # Tweak 1: Add an unknown param to contact header
+    head['Contact'] += ';%s' % random_unknown_param()
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

@@ -14,6 +14,7 @@ from core.plugrun import runPlugin
 from core.requester import buildreq
 from mutators.urlencchar import urlEncodeStrInvalid
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_digits
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -47,7 +48,7 @@ def escinv():
     head['CSeq'] = '%s %s' % (head.get('CSeq').split(' ')[0], newmeth)
     # Tweak 4: Change a contact header
     newct = '%s%s' % ('C', urlEncodeStrInvalid('ontact', value=1))
-    head[newct] = re.sub(r'sip:\w+?@', 'sip:6969@', head.get('Contact'))
+    head[newct] = re.sub(r'sip:\w+?@', 'sip:%s@' % random_digits(3, 5), head.get('Contact'))
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

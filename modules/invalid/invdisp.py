@@ -15,6 +15,7 @@ from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 from mutators.replparam import rmallParam, rmspcParam
+from mutators.fuzzutils import random_digits, random_display_tokens
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -43,10 +44,14 @@ def invdisp():
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify add untokenized header display names
+    from_tokens = random_display_tokens(2)
+    to_tokens = random_display_tokens(3)
     head['From'] = '%s, %s <sip:%s@%s>;tag=%s' % (
-        'siptorch', 'testing', config.DEF_EXT, config.RHOST, random.getrandbits(32))
+        from_tokens[0], from_tokens[1], random_digits(3, 5),
+        config.RHOST, random.getrandbits(32))
     head['To'] = '%s, %s, %s <sip:%s@%s>' % (
-            'server', "shouldn't", 'break', config.DEF_EXT, config.RHOST)
+        to_tokens[0], to_tokens[1], to_tokens[2],
+        random_digits(3, 5), config.RHOST)
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

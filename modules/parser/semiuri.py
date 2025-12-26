@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_domain, random_unknown_param
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -36,8 +37,10 @@ def semiuri():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the header options uri
     newuri = mline.split(' ')[1] 
-    nuri = '%s;param=u%sinfectedsip.net@%s' % (
-        newuri.split('@')[0], r'%40', newuri.split('@')[1])
+    param_name = random_unknown_param(prefix='param-')
+    escaped = 'u%40%s' % random_domain(depth_range=(1, 2))
+    nuri = '%s;%s=%s@%s' % (
+        newuri.split('@')[0], param_name, escaped, newuri.split('@')[1])
     mline = mline.replace(mline.split(' ')[1], nuri)
     # Tweak 2: Add the Accept header
     head['Accept'] = 'application/sdp, application/pkcs7-mime, '

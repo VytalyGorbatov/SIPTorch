@@ -9,10 +9,12 @@
 # This module requires SIPTorch
 # https://github.com/0xInfection/SIPTorch
 
-import logging, random
+import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_huge_numeric_string, random_int_str
+from mutators.fuzzutils import random_warning_agent, random_warning_text
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -36,13 +38,14 @@ def respsclarg():
     # Tweak 1: Modify the method line
     mline = 'SIP/2.0 503 Service Unavailable'
     # Tweak 2: Add retry after header
-    head['Retry-After'] = '%s' % random.getrandbits(100)
+    head['Retry-After'] = random_huge_numeric_string(12, 28)
     # Tweak 3: Add warning header
-    head['Warning'] = '%s overture "In Progress"' % \
-            random.randint(1000, 9999)
+    head['Warning'] = '%s %s "%s"' % (
+        random_int_str(1000, 9999), random_warning_agent(),
+        random_warning_text())
     # Tweak 4: Add large scalar value in cseq
     head['CSeq'] = head.get('CSeq').replace(
-        head.get('CSeq').split(' ')[0], str(random.getrandbits(100)))
+        head.get('CSeq').split(' ')[0], random_huge_numeric_string(12, 28))
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

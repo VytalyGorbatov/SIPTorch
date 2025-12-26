@@ -18,6 +18,7 @@ from core.utils import validateHost
 from core.colors import color, G, O, R
 from libs.data import VERSION as __version__
 from libs.data import LICENSE as __license__
+from mutators.fuzzutils import seed_rng as seed_fuzz_rng
 
 print('''
   %sSIPTorch %s- %sA SIP Torture Testing Suite
@@ -66,6 +67,8 @@ optional.add_argument('--spoof-ua',
                 help='Spoof user-agents with every request randomly', dest='spoof_ua', action='store_true')
 optional.add_argument('--build-cache',
                 help='Build the modules cache (after a new module has been added)', dest='build_cache', action='store_true')
+optional.add_argument('--seed',
+                help='Seed value for fuzzed payload randomization', dest='seed', type=int)
 args = parser.parse_args()
 
 if not len(sys.argv) > 1:
@@ -90,7 +93,7 @@ if args.exten:
     config.DEF_EXT = args.exten
 
 if args.fromaddr:
-    if re.search(r'(?i)^"\w+?"\s<?(?:sip:)?\w+@[\w\-\.]+>?$', args.fromaddr):
+    if re.search(r'(?i)^"\w+?"\s<?(?:sip:)?\w+@[\w\-\.]+:?\d*>?$', args.fromaddr):
         config.FROM_ADDR = args.fromaddr
     else:
         sys.exit(R+" Invalid syntax of from_addr. See help menu for more info about from_addr format.")
@@ -133,3 +136,10 @@ if args.output:
 if args.spoof_ua:
     log.info('Spoofing user-agent from now on')
     config.SPOOF_UA = True
+
+seed_used = seed_fuzz_rng(args.seed if hasattr(args, 'seed') else None)
+config.RANDOM_SEED = seed_used
+if args.seed is not None:
+    log.debug('Using user-provided fuzz seed %s', seed_used)
+else:
+    log.debug('Using generated fuzz seed %s', seed_used)

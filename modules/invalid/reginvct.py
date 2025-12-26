@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_domain
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -39,7 +40,7 @@ def reginvct():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the contact header, and leave it just 
     # like that, not adding any < or > around URL
-    head['Contact'] += r'?Route=%3Csip:sip.example.com%3E'
+    head['Contact'] += r'?Route=%3Csip:%s%3E' % random_domain() #FIXIT: Add random header
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

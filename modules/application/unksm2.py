@@ -14,6 +14,8 @@ from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 from mutators.replparam import genRandStr
+from mutators.fuzzutils import random_contact_name
+from mutators.fuzzutils import random_http_uri, random_token, random_unknown_scheme
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -39,10 +41,10 @@ def unkscm2():
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: modify the header URI scheme
-    head['To'] = '%s:%s' % (genRandStr(4), random.getrandbits(32))
+    head['To'] = '%s:%s' % (random_unknown_scheme(), random_token(6, 12))
     fromhead = head['From']
-    head['From'] = fromhead.replace(fromhead.split(';')[0], '<http://example.com>')
-    head['Contact'] = '<name:siptorch_flames>'
+    head['From'] = fromhead.replace(fromhead.split(';')[0], '<%s>' % random_http_uri())
+    head['Contact'] = '<%s>' % random_contact_name()
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

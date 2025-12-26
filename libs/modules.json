@@ -1,6 +1,5 @@
 {
     "Application Layer Semantics": [
-        "200 OK Response with Broadcast Via Header Field Value",
         "REGISTER with a Contact Header Parameter",
         "REGISTER with a URL in Contact Header Parameter",
         "INVITE Message Missing Required Header Fields",

@@ -135,12 +135,14 @@ def calcLogLevel(args):
 
 
 def extractExtension(addr: string):
-    '''
-    Extracts extension from a address string
-    '''
-    regex = re.compile(r'"?\w*?"?\s*(\w+)@(?:\d{1,3}\.){3}\d{1,3}', addr, re.I)
-    return regex.search(addr).group(1)
-
+    """
+    Extract extension from an address string.
+    Returns the captured group or None if no match.
+    """
+    pattern = r'"?\w*?"?\s*(\w+)@(?:\d{1,3}\.){3}\d{1,3}'
+    regex = re.compile(pattern, re.I)
+    match = regex.search(addr)
+    return match.group(1) if match else None
 
 def clsterm(content: str):
     '''

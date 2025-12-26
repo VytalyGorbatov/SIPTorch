@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_int_str
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -35,7 +36,7 @@ def clerr():
     msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the content length header
-    head['Content-Length'] = '%s' % 9999
+    head['Content-Length'] = random_int_str(len(body) + 100, len(body) + 5000)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

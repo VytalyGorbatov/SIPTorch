@@ -14,6 +14,7 @@ from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 from mutators.replparam import genRandStr
+from mutators.fuzzutils import random_int_str, random_token
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -39,7 +40,8 @@ def invct():
     # Tweak 1: Modify the content type
     head['Content-Type'] = 'application/%s' % genRandStr(10)
     # Tweak 2: Modify the body
-    body = '<audio>\r\n  <pcmu port="443"/>\r\n</audio>'
+    body = '<audio>\r\n  <pcmu port="%s" codec="%s"/>\r\n</audio>' % (
+        random_int_str(1024, 65535), random_token(4, 8))
     # Tweak 3: Modify the content-length
     head['Content-Length'] = '%s' % len(body)
     # Forming the request message back up

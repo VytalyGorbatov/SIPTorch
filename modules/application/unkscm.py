@@ -13,6 +13,7 @@ import logging
 from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_token, random_unknown_scheme
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -41,7 +42,9 @@ def unkscm():
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: modify the request URI scheme
-    mline = mline.replace(mline.split(' ')[1], 'unknownscheme:unknowncontent')
+    mline = mline.replace(
+        mline.split(' ')[1], '%s:%s' % (
+            random_unknown_scheme(), random_token(6, 12)))
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

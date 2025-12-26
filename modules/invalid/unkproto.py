@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_int_str
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -35,8 +36,9 @@ def unkproto():
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Change protocol version
-    mline = mline.replace('SIP/2.0', 'SIP/7.0')
-    head['Via'] = head['Via'].replace('SIP/2.0/UDP', 'SIP/7.0/UDP')
+    version = random_int_str(3, 9)
+    mline = mline.replace('SIP/2.0', 'SIP/%s.0' % version)
+    head['Via'] = head['Via'].replace('SIP/2.0/UDP', 'SIP/%s.0/UDP' % version)
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

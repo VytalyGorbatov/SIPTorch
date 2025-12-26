@@ -28,6 +28,9 @@ LPORT = 5060
 # Parts of the SIP message #
 ############################
 
+# Random seed for reproducible fuzzing
+RANDOM_SEED = None
+
 # Whether to use a hardcoded string as Call-ID
 STATIC_CID = False
 # If you're using a static call id put it here

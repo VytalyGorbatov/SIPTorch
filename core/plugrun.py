@@ -14,6 +14,7 @@ import sys
 import json
 import socket
 import logging
+import random
 import pluginbase
 from libs import config
 from core.logger import logresp
@@ -112,6 +113,16 @@ def runAll(options=None):
         print('executing')
         buildcache(pluginsource)  # <- Uncomment this line to build cache
         return
-    for plug in pluginsource.list_plugins():
-        p = pluginsource.load_plugin(plug)
-        p.run()
+    # Select and run exactly one random plugin test instead of all
+    available = list(pluginsource.list_plugins())
+    if not available:
+        log.warning('No plugins discovered to run')
+        return
+    chosen = random.choice(available)
+    log.info('Randomly selected plugin: %s', chosen)
+    p = pluginsource.load_plugin(chosen)
+    # Defensive: ensure plugin has run attribute
+    if not hasattr(p, 'run'):
+        log.error('Selected plugin %s has no run() function', chosen)
+        return
+    p.run()

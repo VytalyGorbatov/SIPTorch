@@ -14,6 +14,7 @@ from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 from mutators.replparam import rmallParam, rmspcParam
+from mutators.fuzzutils import random_int_str
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -34,7 +35,7 @@ def cseqmatch():
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify CSeq header
-    head['CSeq'] = '5 INVITE'
+    head['CSeq'] = '%s INVITE' % random_int_str(2, 20)
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

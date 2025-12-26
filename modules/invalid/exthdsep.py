@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_separator_pattern
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -37,9 +38,9 @@ def exthdsep():
     msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the via header
-    head['Via'] += r';;,;,,'
+    head['Via'] += random_separator_pattern()
     # Tweak 2: Add contact header
-    head['Contact'] += r';;;;,;'
+    head['Contact'] += random_separator_pattern()
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

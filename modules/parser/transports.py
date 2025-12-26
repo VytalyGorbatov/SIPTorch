@@ -10,10 +10,11 @@
 # https://github.com/0xInfection/SIPTorch
 
 from libs import config
-import logging, socket, random
+import logging, socket, random, string
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_token
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -46,8 +47,9 @@ def transports():
     head['via'] = 'SIP/2.0/TCP %s:%s;branch=z9hG4bK-%s;rport' % \
         (srchost, config.LPORT, random.getrandbits(32))
     # Add unknown type as transport method in via header
-    head['VIa'] = 'SIP/2.0/UNKNOWN %s:%s;branch=z9hG4bK-%s;rport' % \
-        (srchost, config.LPORT, random.getrandbits(32))
+    unknown_transport = 'UNKNOWN-%s' % random_token(4, 8, alphabet=string.ascii_uppercase)
+    head['VIa'] = 'SIP/2.0/%s %s:%s;branch=z9hG4bK-%s;rport' % \
+        (unknown_transport, srchost, config.LPORT, random.getrandbits(32))
     # Add tls as transport method in via header
     head['vIA'] = 'SIP/2.0/TLS %s:%s;branch=z9hG4bK-%s;rport' % \
         (srchost, config.LPORT, random.getrandbits(32))

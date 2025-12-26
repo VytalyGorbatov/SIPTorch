@@ -10,9 +10,11 @@
 # https://github.com/0xInfection/SIPTorch
 
 import logging
+import string
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_token
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -37,7 +39,8 @@ def metmatch():
     msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify method line
-    line = 'BLABLAMETHOD %s %s' % (
+    line = '%s %s %s' % (
+        random_token(6, 12, alphabet=string.ascii_uppercase),
         mline.split(' ')[1], mline.split(' ')[2])
     # NOTE: We are not modifying the CSeq header since it is already
     # set to 1 INVITE, hence not messing up anyway

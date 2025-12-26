@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_unknown_param
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -33,7 +34,7 @@ def lwsuri():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Insert lws after the URI element
     requri = mline.split(' ')[1]
-    requri += r'; somerandomparamter'
+    requri += '; %s' % random_unknown_param(prefix='param-')
     mline = mline.replace(mline.split(' ')[1], requri)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)

@@ -14,6 +14,7 @@ from libs import config
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_domain, random_known_scheme
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -39,7 +40,8 @@ def novelscm():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
-    requri = 'beep.boop://%s:%s' % (config.IP, config.RPORT)
+    scheme = random_known_scheme()
+    requri = '%s://%s:%s' % (scheme, random_domain(), config.RPORT)
     # Tweak 1: Remove the following required headers
     mline = mline.replace(mline.split(' ')[1], requri)
     # Forming the request message back up

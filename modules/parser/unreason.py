@@ -13,6 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_int_str, random_reason_phrase
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -41,12 +42,10 @@ def unreason():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the header of the message
     # We are using a 20 char to form the remaining
-    utfencstr = r'e0a6a4e0a6ace0a78720e0a68fe0a695e0a6b6e0a'
-    utfencstr += r'78b20e0a6a8e0a6bfe0a6b0e0a6bee0a6a8e0a6ace0a78de'
-    utfencstr += r'0a6ace0a68720e0a6afe0a6a5e0a787e0a6b7e0a78de0a'
-    utfencstr += r'69f20e0a6b8e0a6b9e0a69c20e0a69be0a6bfe0a6b2'
-    mline = 'SIP/2.0 200 = %s * %s %s' % ('2**5', '5**2',
-        bytearray.fromhex(utfencstr).decode('utf-8'))
+    expr_one = '%s**%s' % (random_int_str(2, 9), random_int_str(2, 5))
+    expr_two = '%s**%s' % (random_int_str(2, 9), random_int_str(2, 5))
+    mline = 'SIP/2.0 200 = %s * %s %s' % (
+        expr_one, expr_two, random_reason_phrase())
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

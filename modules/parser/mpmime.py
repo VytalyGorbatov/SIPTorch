@@ -15,6 +15,7 @@ from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 from mutators.replparam import genRandStr
+from mutators.fuzzutils import random_domain, random_int_str, random_sentence
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -55,7 +56,8 @@ def mpmime():
     # Boundary to be used
     boundary = genRandStr(16, allow_digits=True)
     # Tweak 1: Add a route header
-    head['Route'] = '<sip:127.0.0.1:5080>'
+    head['Route'] = '<sip:%s:%s>' % (
+        random_domain(depth_range=(1, 2)), random_int_str(1024, 65535))
     # Tweak 2; Add the identity header
     head['Identity'] = config.IDENTITY
     # Tweak 3: Add cte header to binary
@@ -64,7 +66,8 @@ def mpmime():
     head['Content-Type'] = 'multipart/mixed;boundary=%s' % boundary
     # Tweak 5: Add the body
     body = '--%s\r\nContent-Type: text/plain\r\nContent-Transfer-Encoding' % boundary
-    body += ': binary\r\n\r\nHi from siptorch - pls dont break\r\n--%s\r\n' % boundary
+    body += ': binary\r\n\r\n%s\r\n--%s\r\n' % (
+        random_sentence(word_range=(5, 9)).capitalize(), boundary)
     body += 'Content-Type: application/octet-stream\r\nContent-Tran'
     body += 'sfer-Encoding: binary\r\n\r\n%s\r\n--%s--' % (
         bytearray.fromhex(cer).decode('utf-8', errors='ignore'), boundary)

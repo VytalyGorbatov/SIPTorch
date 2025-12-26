@@ -14,6 +14,7 @@ from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 from mutators.replparam import genRandStr
+from mutators.fuzzutils import random_token
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -47,7 +48,9 @@ def unkauth():
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Add invalid auth scheme
-    head['Authorization'] = '%s %s' % (genRandStr(15), 'randparam-data=valuehere')
+    param_name = '%s-%s' % (random_token(4, 7), random_token(3, 6))
+    param_value = random_token(6, 12)
+    head['Authorization'] = '%s %s=%s' % (genRandStr(15), param_name, param_value)
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

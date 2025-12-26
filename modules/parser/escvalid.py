@@ -16,6 +16,7 @@ from core.requester import buildreq
 from mutators.urlencchar import urlEncodeStrValid
 from mutators.urlencchar import urlEncodeStrInvalid
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_sentence, random_token
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -49,16 +50,16 @@ def escvalid():
     mline = re.sub(r'sip:\w+@', 'sip:%s@' % user, mline)
     # Tweak 2: Modify the to and from headers
     head['To'] = 'sip:%s@%s' % (
-        urlEncodeStrInvalid('user', value=2), config.RHOST)
+        urlEncodeStrInvalid(random_token(4, 8), value=2), config.RHOST)
     head['From'] = '<sip:%s@%s>;tag=%s' % (
-        urlEncodeStrValid('I have spaces in user name'), 
+        urlEncodeStrValid(random_sentence((3, 5))), 
         config.RHOST, random.getrandbits(32))
     # Tweak 3: modify the contact header
     head['Contact'] = '<sip:%s@%s;%s;%s=%s%s>' % (
-        urlEncodeStrInvalid('caller', value=1),
-        config.RHOST, urlEncodeStrInvalid('lr', value=2),
-        urlEncodeStrInvalid('name', value=1),
-        urlEncodeStrInvalid('value', value=2),
+        urlEncodeStrInvalid(random_token(5, 9), value=1),
+        config.RHOST, urlEncodeStrInvalid(random_token(2, 4), value=2),
+        urlEncodeStrInvalid(random_token(4, 7), value=1),
+        urlEncodeStrInvalid(random_token(4, 7), value=2),
         r'%25%34%31'
     )
     # Forming the message up back again

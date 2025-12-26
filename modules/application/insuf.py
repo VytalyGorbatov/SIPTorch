@@ -13,6 +13,7 @@ import logging
 from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_int_str
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -39,7 +40,7 @@ def insuf():
     for x in rmhead:
         head.pop(x, None)
     # Tweak 2: Adding a random header
-    head['Content-Length'] = '152'
+    head['Content-Length'] = random_int_str(100, 999)
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

@@ -13,6 +13,7 @@ import logging
 from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
+from mutators.fuzzutils import random_domain
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -37,7 +38,7 @@ def regeschd():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Contact header where URI has escaped header
     head['Contact'] = head.get('Contact').strip('<>')
-    head['Contact'] += r'?Route=%3Csip:sip.example.com%3E'
+    head['Contact'] += r'?Route=%3Csip:%s%3E' % random_domain()
     head['Contact'] = '<%s>' % head['Contact']
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
