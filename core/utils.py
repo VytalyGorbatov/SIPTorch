@@ -78,7 +78,7 @@ def lookUp(url: str, typef='ip', port=config.RPORT):
     log = logging.getLogger('lookUp')
     # Checking for TCP support, might be useful for future support
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(2)
         if typef == 'ip':
             if s.connect_ex((url, port)) == 0:

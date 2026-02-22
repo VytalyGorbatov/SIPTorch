@@ -13,7 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
-from mutators.fuzzutils import random_domain
+from mutators.fuzzutils import random_domain, random_word
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -41,7 +41,7 @@ def escuri():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the header
     newrequri = mline.split(' ')[1]
-    newrequri += r'?Route=%3Csip:%s%3E' % random_domain() #FIXIT: Add random header
+    newrequri += f'?{random_word()}=%3Csip:{random_domain()}%3E'
     mline = mline.replace(mline.split(' ')[1], newrequri)
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

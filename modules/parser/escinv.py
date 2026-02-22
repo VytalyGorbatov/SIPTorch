@@ -46,9 +46,18 @@ def escinv():
     head['From'] = re.sub(r'\"\w+?\"', '"%Z%45"', head.get('From'))
     # Tweak 3: Change the Cseq header
     head['CSeq'] = '%s %s' % (head.get('CSeq').split(' ')[0], newmeth)
-    # Tweak 4: Change a contact header
+    # Tweak 4: Change a contact header, guarding against missing Contact
+    contact_value = head.get('Contact')
+    if not isinstance(contact_value, str) or contact_value.strip() == '':
+        fallback_host = 'invalid'
+        to_header = head.get('To')
+        if isinstance(to_header, str) and '@' in to_header:
+            fallback_host = to_header.split('@', 1)[-1].split('>')[0].strip()
+        contact_value = '<sip:fallback@%s>' % fallback_host
+        head['Contact'] = contact_value
     newct = '%s%s' % ('C', urlEncodeStrInvalid('ontact', value=1))
-    head[newct] = re.sub(r'sip:\w+?@', 'sip:%s@' % random_digits(3, 5), head.get('Contact'))
+    head[newct] = re.sub(
+        r'sip:\w+?@', 'sip:%s@' % random_digits(3, 5), contact_value)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

@@ -106,10 +106,8 @@ DEF_EXT = "2000"
 
 # Default header set
 DEF_HSET = {
-    'Allow'         : 'INVITE, ACK, CANCEL, BYE, NOTIFY, REFER, MESSAGE, OPTIONS, INFO, SUBSCRIBE',
-    'Max-Forwards'  : '70',
-    'Accept'        : ACCEPT,
-    'Call-ID'       : CALL_ID
+    'Call-ID'       : CALL_ID,
+    'Max-Forwards'  : '70'
 }
 
 # Timeout to use

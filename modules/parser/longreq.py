@@ -16,8 +16,7 @@ from core.plugrun import runPlugin
 from core.requester import buildreq
 from mutators.multihead import multiHead
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
-from mutators.fuzzutils import random_domain
-from mutators.fuzzutils import random_unknown_param, repeat_char, repeat_token
+from mutators.fuzzutils import random_domain, random_sentence, random_text, random_unknown_param, repeat_char, repeat_token
 
 module_info = {
     'category'  :   'Syntactical Parser Tests',
@@ -37,30 +36,30 @@ def longreq():
     msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Such long To value
-    longto = "I have a user name of %s proportion" % repeat_token((5, 9), (9, 14)) #FIXIT: randomize string
+    longto = random_sentence((8, 12)) + repeat_token((5, 9), (9, 14))
     head['To'] = "%s <%s" % (longto, head.get('To').split('<')[1])
     head['To'] += ';%s=%s' % (
-        random_unknown_param(), 'veryl%sgnvalue' % repeat_char('o', 50, 80)) #FIXIT: randomize string
+        random_unknown_param(), random_text() + repeat_char('o', 50, 80))
     head['To'] += ';%s=%s' % (
-        random_unknown_param(prefix=''), 'shortvalue')
-    head['To'] += 'very%sparamwithnovalueatall' % repeat_token((4, 7), (8, 12)) #FIXIT: randomize string
+        random_unknown_param(prefix=''), random_text((1,1)) )
+    head['To'] += random_text() + repeat_token((4, 7), (8, 12))
     # Tweak 2: Such long From Value
     head['From'] = 'sip:%s@%s' % (repeat_token((6, 10), (8, 12)), config.RHOST)
     head['From'] += ';tag=10%s420' % repeat_char(string.digits, 60, 120)
     head['From'] += ';%s=%s' % (
         random_unknown_param(prefix=''), repeat_token((5, 9), (7, 11)))
-    head['From'] += 'paramless%s' % repeat_token((5, 8), (6, 10))
+    head['From'] += random_text((1, 3)) + repeat_token((5, 8), (6, 10))
     # Tweak 3: add call id
-    head['Call-ID'] = 'longreq.one%slongcallidhere' % repeat_token((6, 9), (7, 12))
+    head['Call-ID'] = random_text() + repeat_token((6, 9), (7, 12))
     # Tweak 4: add contact
     head['Contact'] = '<sip:%s@%s>' % (
         repeat_token((6, 9), (8, 12)), config.RHOST)
     # Tweak 5: add unknown value
-    key = 'Unknown-L%sng-Field' % repeat_char('o', 40, 75)
+    key = '%s-L%sng-Field' % (random_text((1,1)), repeat_char('o', 40, 75))
     head[key] = '%s;%s=%s' % (
-        'unknown-%s-value' % repeat_token((4, 7), (6, 10)), #FIXIT: randomize string
-        'unknown-%s-parameter-name' % repeat_token((4, 7), (5, 9)), #FIXIT: randomize string
-        'unknown-%s-parameter-value' % repeat_token((4, 7), (6, 9)) #FIXIT: randomize string
+        '%s-%s-value' % (random_text((1,1)), repeat_token((4, 7), (6, 10))),
+        '%s-%s-parameter-name' % (random_text((1,1)), repeat_token((4, 7), (5, 9))),
+        '%s-%s-parameter-value' % (random_text((1,1)), repeat_token((4, 7), (6, 9)))
     )
     # Tweak 6: multiply the number of via headers
     pset = multiHead('Via', permuteasdict=True, singlestr=False)

@@ -42,10 +42,14 @@ def escnull():
     head['From'] = re.sub(r'sip:\w+?@', 
         'sip:null-%s-null@' % NULL_CHAR, head.get('From'))
     # Tweak 2: Modify the contact header
-    head['Contact'] = re.sub(r'sip:\w+?@', 
-        'sip:%s@' % NULL_CHAR, head.get('Contact'))
-    head['CONTACT'] = re.sub(r'sip:\w+?@', 
-        'sip:%s@' % (NULL_CHAR*5), head.get('Contact'))
+    contact_val = head.get('Contact')
+    if contact_val:
+        head['Contact'] = re.sub(r'sip:\w+?@', 
+            'sip:%s@' % NULL_CHAR, contact_val)
+        head['CONTACT'] = re.sub(r'sip:\w+?@', 
+            'sip:%s@' % (NULL_CHAR*5), contact_val)
+    else:
+        log.warning('Contact header missing; skipping Contact modifications')
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

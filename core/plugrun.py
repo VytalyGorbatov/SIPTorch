@@ -78,7 +78,6 @@ def buildcache(pluginlist):
     '''
     testtypes = [
         'Application Layer Semantics',
-        'Backward Compatability Tests',
         'Invalid Messages',
         'Syntactical Parser Tests',
         'Transaction Layer Semantics'
@@ -103,8 +102,7 @@ def runAll(options=None):
     log.debug('Loading all modules')
     plugin = pluginbase.PluginBase(package='modules')
     pluginsource = plugin.make_plugin_source(
-        searchpath=['./modules/application', 
-                    './modules/backcomp', 
+        searchpath=['./modules/application',
                     './modules/invalid',
                     './modules/parser',
                     './modules/transaction'

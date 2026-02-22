@@ -13,7 +13,7 @@ import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
-from mutators.fuzzutils import random_huge_numeric_string, random_int_str
+from mutators.fuzzutils import random_word, random_domain, random_huge_numeric_string, random_int_str
 
 module_info = {
     'category'  :   'Invalid Messages',
@@ -48,6 +48,10 @@ def reqsclarg():
     # Tweak 3: Add Expires value > 2**32-1
     head['Expires'] = random_huge_numeric_string(14, 36)
     # Tweak 4: Contact header expires header
+
+    if 'Contact' not in head:
+        head['Contact'] = '<sip:%s@%s>' % (random_word(), random_domain())
+
     head['Contact'] += ';expires=%s' % random_huge_numeric_string(12, 30)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
