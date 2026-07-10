@@ -52,8 +52,10 @@ SRC_HOST = None
 # Default Cseq value to use
 CSEQ = 1
 
-# User-agent to use
-USER_AGENT = 'siptorch/0.1'
+# User-agent to use.
+# Left unset by default so normal requests emit NO User-Agent header.
+# Set to a truthy string (or pass --user-agent) to emit one.
+USER_AGENT = None
 
 # Contact header to use
 CONTACT = None
@@ -87,7 +89,7 @@ IDENTITY += r'ojNCpTzO3QfPOlckGaS6hEck7w;info=<https://0xInfection.xyz/random.ce
 INVITE_BODY =  'v=0\r\n'
 INVITE_BODY += 'o=mhandley 29739 7272939 IN IP4 x.x.x.x\r\n'
 INVITE_BODY += 's=-\r\n'
-INVITE_BODY += 'c=IN IP4 y.y.y.y\r\n'
+INVITE_BODY += 'c=IN IP4 x.x.x.x\r\n'
 INVITE_BODY += 't=0 0\r\n'
 INVITE_BODY += 'm=audio 49217 RTP/AVP 0 12\r\n'
 INVITE_BODY += 'm=video 3227 RTP/AVP 31\r\n'

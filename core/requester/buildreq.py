@@ -32,6 +32,12 @@ def makeRequest(method, bsbody=''):
     if 'invite' in method.lower():
         body = INVITE_BODY
         body = body.replace('x.x.x.x', srchost).replace('y.y.y.y', dsthost)
+        # Randomize the SDP o= session-id / version per request so the
+        # static template values do not leak the generator (benign-observed ranges)
+        sess_id = random.randint(1767520664, 1767542828)
+        sess_ver = random.randint(232, 999749)
+        body = re.sub(r'(o=mhandley )\d+ \d+( IN IP4 )',
+                      r'\g<1>%d %d\g<2>' % (sess_id, sess_ver), body)
     if bsbody:
         body = bsbody
     if extension is None or method.upper() == 'REGISTER':
@@ -59,25 +65,25 @@ def makeRequest(method, bsbody=''):
         headers['To'] = headers['From']
     if method.lower() != 'ack':
         if FROM_TAG is None:
-            headers['From'] += ';tag=%sSIPpTag001' % str(os.getpid())
+            headers['From'] += ';tag=%sSIPpTag' % str(os.getpid())
         else:
             headers['From'] += ';tag='+FROM_TAG
 
     if not STATIC_CID:
-        headers["Call-ID"] = "1-" + str(os.getpid())
+        headers["Call-ID"] = "1-" + str(os.getpid()) + "@" + srchost
     else:
         headers["Call-ID"] = CALL_ID
 
     headers['CSeq'] = '%s %s' % (CSEQ, method)
 
     if 'register' not in method.lower():
-        headers['Contact'] = '<sip:%s@%s:%s>' % (senderext, RHOST, RPORT)
+        headers['Contact'] = '<sip:%s@%s:%s>' % (senderext, srchost, LPORT)
 
     headers['Max-Forwards'] = 70
 
     if SPOOF_UA:
         headers['User-Agent'] = randUASelect()
-    else:
+    elif USER_AGENT:
         headers['User-Agent'] = USER_AGENT
 
     if 'invite' in method.lower():
@@ -85,6 +91,9 @@ def makeRequest(method, bsbody=''):
 
     if CONTENT_TYPE is not None and len(body) > 0:
         contenttype = CONTENT_TYPE
+    elif len(body) > 0 and body.startswith('v=0'):
+        # A normal (non-torture) SDP body must advertise its media type
+        contenttype = 'application/sdp'
     if contenttype is not None:
         headers['Content-Type'] = contenttype
 
